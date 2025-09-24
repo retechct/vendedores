@@ -1,34 +1,27 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// GET (por ID): Para obtener un solo vendedor
-export async function GET(
-  request: Request,
-  context: { params: { id: string } }
-) {
+interface Context {
+  params: { id: string }
+}
+
+export async function GET(request: Request, context: Context) {
   try {
     const { id } = context.params;
     const vendedor = await prisma.vendedor.findUnique({
       where: { id_ven: Number(id) },
-      include: { 
-        distrito: true,
-        especialidad: true,
-      },
+      include: { distrito: true, especialidad: true },
     });
     if (!vendedor) {
       return NextResponse.json({ message: 'Vendedor no encontrado' }, { status: 404 });
     }
     return NextResponse.json(vendedor);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Error al obtener vendedor' }, { status: 500 });
   }
 }
 
-// PUT: Para actualizar un vendedor
-export async function PUT(
-  request: Request,
-  context: { params: { id: string } }
-) {
+export async function PUT(request: Request, context: Context) {
   try {
     const { id } = context.params;
     const data = await request.json();
@@ -43,23 +36,19 @@ export async function PUT(
       },
     });
     return NextResponse.json(vendedorActualizado);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Error al actualizar vendedor' }, { status: 500 });
   }
 }
 
-// DELETE: Para eliminar un vendedor
-export async function DELETE(
-  request: Request,
-  context: { params: { id: string } }
-) {
+export async function DELETE(request: Request, context: Context) {
   try {
     const { id } = context.params;
     const vendedorEliminado = await prisma.vendedor.delete({
       where: { id_ven: Number(id) },
     });
     return NextResponse.json(vendedorEliminado);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Error al eliminar vendedor' }, { status: 500 });
   }
 }
